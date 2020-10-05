@@ -1,39 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 import VideoList from "./VideoList";
 import VideoDetail from "./VideoDetail";
-import youtube from "../api/youtube";
+import useVideos from "../hooks/useVideos";
 
+const App = () => {
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [videos, onSearchSubmit] = useVideos("Red Dead Redemption 2");
 
-class App extends React.Component {
-  state = { videos: [], video: null }
+  useEffect(() => {
+    setSelectedVideo(videos[0]);
+  }, [videos]);
+  
 
-  onSearchSubmit = async (term) => {
-    const response = await youtube.get('/search', {
-      params: {
-        q: term
-      }
-    });
-    this.setState({videos: response.data.items});
-  };
-
-  onVideoSelect = (video) => {
-    console.log(video);
-    this.setState({video: video})
-  }
-
-  render() {
-    return (
-      <div className="ui container" style={{ paddingTop: "10px" }}>
-        <SearchBar onSearchSubmit={this.onSearchSubmit} />
-        <VideoDetail video={this.state.video} />
-        <VideoList
-          onVideoSelect={this.onVideoSelect}
-          videos={this.state.videos}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div className="ui container" style={{ paddingTop: "10px" }}>
+      <SearchBar onSearchSubmit={onSearchSubmit} />
+      <VideoDetail video={selectedVideo} />
+      <VideoList
+        onVideoSelect={setSelectedVideo}
+        videos={videos}
+      />
+    </div>
+  );
+};
 
 export default App;
